@@ -1,0 +1,7 @@
+# Optional local-only credentials/configuration; never publish these files.
+/data/admin.json
+/data/payments.json
+
+# Temporary/local files.
+/data/sess_*
+/data/*.tmp

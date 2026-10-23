@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Editor katalog JB_AKUN</title>
+  <style>
+    :root{color-scheme:dark;--bg:#10111a;--panel:#191a25;--line:rgba(255,255,255,.1);--text:#f5f5fa;--muted:#989bad;--lime:#c8fb63;--red:#ff829b}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 "Segoe UI",Arial,sans-serif}.wrap{width:min(1120px,calc(100% - 32px));margin:30px auto 65px}a{color:var(--lime);text-decoration:none}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px}.brand{font-size:21px;font-weight:800;letter-spacing:-1px}.brand span{color:var(--lime)}h1,h2{margin:0 0 8px;letter-spacing:-.04em}h1{font-size:29px}h2{font-size:19px}.muted{color:var(--muted);font-size:12px}
+    .panel{margin-bottom:16px;padding:21px;border:1px solid var(--line);border-radius:15px;background:var(--panel)}.notice{padding:12px 14px;border:1px solid rgba(255,189,83,.28);border-radius:10px;background:rgba(255,189,83,.08);color:#f2d49a;font-size:12px;line-height:1.65}.status{min-height:18px;margin:10px 0;color:var(--lime);font-size:12px}.toolbar,.panel-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}.toolbar{flex-wrap:wrap;margin:15px 0}
+    .button{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 13px;border:1px solid var(--line);border-radius:9px;background:#222431;color:var(--text);cursor:pointer;font:inherit;font-size:12px;font-weight:700}.button:hover{border-color:var(--lime)}.button.primary{background:var(--lime);border-color:var(--lime);color:#17190f}.button.danger{color:var(--red)}.button.small{min-height:31px;padding:0 9px;font-size:11px}.file-button input{display:none}
+    .product-list{display:grid;gap:9px}.product-row{display:grid;grid-template-columns:60px minmax(0,1fr) auto;align-items:center;gap:12px;padding:11px;border:1px solid var(--line);border-radius:11px;background:#14151e}.thumb{width:60px;height:60px;display:grid;place-items:center;overflow:hidden;border-radius:9px;background:#292a3a;font-size:25px}.thumb img{width:100%;height:100%;object-fit:cover}.product-row strong{display:block;font-size:12px}.product-row small{color:var(--muted);font-size:10px}.row-actions{display:flex;gap:7px}
+    .form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.field label{display:block;margin-bottom:5px;color:#d3d4df;font-size:11px;font-weight:700}.field input,.field textarea{width:100%;min-height:39px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;outline:0;background:#10111a;color:var(--text);font:inherit;font-size:12px}.field textarea{min-height:70px;resize:vertical}.field input:focus,.field textarea:focus{border-color:var(--lime)}.field.full{grid-column:1/-1}.hint{display:block;margin-top:5px;color:var(--muted);font-size:10px}.preview{display:block;max-width:180px;max-height:120px;margin-top:8px;border-radius:8px;object-fit:contain;background:#fff}.form-actions{display:flex;gap:8px;grid-column:1/-1}.empty{padding:25px;border:1px dashed var(--line);border-radius:10px;color:var(--muted);text-align:center;font-size:12px}
+    @media(max-width:650px){.wrap{margin-top:18px}.panel{padding:15px}.panel-heading,.top{align-items:flex-start}.product-row{grid-template-columns:48px minmax(0,1fr)}.thumb{width:48px;height:48px}.row-actions{grid-column:2}.form{grid-template-columns:1fr}.field.full,.form-actions{grid-column:auto}h1{font-size:24px}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="top">
+      <div><a class="brand" href="index.html">JB_AKUN<span>.</span></a><h1 style="margin-top:13px">Editor katalog</h1></div>
+      <a href="index.html">Lihat website ↗</a>
+    </header>
+    <div class="notice"><strong>Editor statis, bukan admin privat.</strong> GitHub Pages tidak menyediakan login atau penyimpanan perubahan. Edit di sini hanya di browser ini; setelah selesai, unduh <code>catalog.json</code>, gantikan file di repository, lalu commit/push. Semua nomor pembayaran dan gambar yang dimasukkan ke katalog akan tampil secara publik—jangan masukkan kata sandi atau data rahasia.</div>
+    <p class="status" id="status" role="status"></p>
+
+    <section class="panel">
+      <div class="panel-heading"><div><h2>Produk katalog</h2><span class="muted" id="productCount"></span></div><button class="button primary" id="addProduct" type="button">+ Tambah produk</button></div>
+      <div class="toolbar">
+        <button class="button" id="downloadCatalog" type="button">Unduh catalog.json</button>
+        <label class="button file-button">Buka catalog.json<input id="importCatalog" type="file" accept="application/json,.json"></label>
+      </div>
+      <div class="product-list" id="productList"></div>
+    </section>
+
+    <section class="panel" id="productEditor" hidden>
+      <h2 id="productEditorTitle">Tambah produk</h2>
+      <form class="form" id="productForm">
+        <input type="hidden" id="productId">
+        <div class="field"><label for="game">Nama game *</label><input id="game" required maxlength="60"></div>
+        <div class="field"><label for="short">Label singkat *</label><input id="short" required maxlength="24"></div>
+        <div class="field"><label for="emoji">Emoji kategori *</label><input id="emoji" required maxlength="20"></div>
+        <div class="field"><label for="seller">Nama seller *</label><input id="seller" required maxlength="60"></div>
+        <div class="field full"><label for="name">Judul/deskripsi akun *</label><input id="name" required maxlength="120"></div>
+        <div class="field"><label for="price">Harga (Rupiah) *</label><input id="price" type="number" min="1" step="1" required></div>
+        <div class="field"><label for="rating">Rating 0–5 *</label><input id="rating" type="number" min="0" max="5" step="0.1" required></div>
+        <div class="field"><label for="popularity">Urutan populer 0–100 *</label><input id="popularity" type="number" min="0" max="100" step="1" required></div>
+        <div class="field full"><label for="stats">Detail akun</label><textarea id="stats" placeholder="Pisahkan tiap detail dengan koma"></textarea><span class="hint">Maksimal 6 detail, misalnya Rank Mythic, 120 Skin.</span></div>
+        <div class="field full"><label for="productImage">Gambar produk</label><input id="productImage" type="file" accept="image/jpeg,image/png,image/webp"><span class="hint">Opsional. JPG, PNG, WebP maksimal 500 KB. Gambar akan disimpan di catalog.json dan menjadi publik.</span><img class="preview" id="productImagePreview" alt="Pratinjau gambar" hidden></div>
+        <div class="form-actions"><button class="button primary" type="submit">Simpan produk</button><button class="button" id="cancelProduct" type="button">Batal</button></div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Metode pembayaran (opsional)</h2>
+      <p class="muted">Isi hanya jika setuju rincian pembayaran tampil untuk semua pengunjung. Ini tidak membuat pembayaran otomatis.</p>
+      <form class="form" id="paymentsForm">
+        <div class="field"><label for="danaNumber">Nomor DANA</label><input id="danaNumber" maxlength="40"></div>
+        <div class="field"><label for="danaName">Nama pemilik DANA</label><input id="danaName" maxlength="80"></div>
+        <div class="field"><label for="bankName">Nama bank</label><input id="bankName" maxlength="60"></div>
+        <div class="field"><label for="bankNumber">Nomor rekening</label><input id="bankNumber" maxlength="40"></div>
+        <div class="field"><label for="bankHolder">Nama pemilik rekening</label><input id="bankHolder" maxlength="80"></div>
+        <div class="field"><label for="walletProvider">E-wallet lain (GoPay/OVO)</label><input id="walletProvider" maxlength="40"></div>
+        <div class="field"><label for="walletNumber">Nomor e-wallet</label><input id="walletNumber" maxlength="40"></div>
+        <div class="field"><label for="walletName">Nama pemilik e-wallet</label><input id="walletName" maxlength="80"></div>
+        <div class="field full"><label for="qrisImage">Gambar QRIS</label><input id="qrisImage" type="file" accept="image/jpeg,image/png,image/webp"><span class="hint">Opsional. JPG, PNG, WebP maksimal 500 KB. QRIS dan nomor yang diunggah akan tersedia bagi publik.</span><img class="preview" id="qrisImagePreview" alt="Pratinjau QRIS" hidden></div>
+        <div class="form-actions"><button class="button primary" type="submit">Simpan metode pembayaran</button></div>
+      </form>
+    </section>
+  </main>
+  <script>
+    const emptyPayments = {
+      dana: { number: "", name: "" },
+      qris: { image: "", name: "" },
+      bank: { bank: "", number: "", name: "" },
+      ewallet: { provider: "", number: "", name: "" }
+    };
+    const state = { products: [], payments: structuredClone(emptyPayments), editingId: null };
+    const $ = id => document.getElementById(id);
+    const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
+    const setStatus = message => { $("status").textContent = message; };
+    const priceLabel = value => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(value);
+
+    function renderProducts() {
+      $("productCount").textContent = `${state.products.length} produk`;
+      $("productList").innerHTML = state.products.length ? state.products.map(product => `
+        <article class="product-row">
+          <div class="thumb">${product.image ? `<img src="${escapeHTML(product.image)}" alt="">` : escapeHTML(product.emoji || "🎮")}</div>
+          <div><strong>${escapeHTML(product.name)}</strong><small>${escapeHTML(product.game)} · ${priceLabel(product.price)} · ${escapeHTML(product.seller)}</small></div>
+          <div class="row-actions"><button class="button small" type="button" data-edit="${Number(product.id)}">Edit</button><button class="button small danger" type="button" data-delete="${Number(product.id)}">Hapus</button></div>
+        </article>`).join("") : '<div class="empty">Belum ada produk. Tambahkan produk atau buka catalog.json.</div>';
+    }
+
+    function resetProductForm() {
+      state.editingId = null;
+      $("productForm").reset();
+      $("productId").value = "";
+      $("productEditorTitle").textContent = "Tambah produk";
+      $("productImagePreview").hidden = true;
+      $("productImagePreview").removeAttribute("src");
+      $("productEditor").hidden = true;
+    }
+
+    function editProduct(id) {
+      const product = state.products.find(item => item.id === id);
+      if (!product) return;
+      state.editingId = id;
+      $("productEditorTitle").textContent = "Edit produk";
+      $("productId").value = String(id);
+      ["game", "short", "emoji", "seller", "name", "price", "rating", "popularity"].forEach(key => { $(key).value = product[key] ?? ""; });
+      $("stats").value = Array.isArray(product.stats) ? product.stats.join(", ") : "";
+      showPreview("productImagePreview", product.image || "");
+      $("productEditor").hidden = false;
+      $("productEditor").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function showPreview(id, source) {
+      const image = $(id);
+      image.hidden = !source;
+      if (source) image.src = source;
+      else image.removeAttribute("src");
+    }
+
+    async function readImage(file) {
+      if (!file) return "";
+      if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) throw new Error("Gambar harus berformat JPG, PNG, atau WebP.");
+      if (file.size > 500 * 1024) throw new Error("Ukuran gambar maksimal 500 KB agar catalog.json tidak terlalu besar.");
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => typeof reader.result === "string" ? resolve(reader.result) : reject(new Error("File gambar gagal dibaca."));
+        reader.onerror = () => reject(new Error("File gambar gagal dibaca."));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function loadCatalog(data) {
+      const products = Array.isArray(data) ? data : data?.products;
+      if (!Array.isArray(products) || products.some(item => !item || !Number.isInteger(Number(item.id)))) {
+        throw new Error("Format catalog.json tidak sesuai.");
+      }
+      state.products = products.map(item => ({ ...item, id: Number(item.id), stats: Array.isArray(item.stats) ? item.stats : [] }));
+      state.payments = {
+        dana: { ...emptyPayments.dana, ...(Array.isArray(data) ? {} : data.payments?.dana) },
+        qris: { ...emptyPayments.qris, ...(Array.isArray(data) ? {} : data.payments?.qris) },
+        bank: { ...emptyPayments.bank, ...(Array.isArray(data) ? {} : data.payments?.bank) },
+        ewallet: { ...emptyPayments.ewallet, ...(Array.isArray(data) ? {} : data.payments?.ewallet) }
+      };
+      renderProducts();
+      populatePaymentForm();
+    }
+
+    function populatePaymentForm() {
+      $("danaNumber").value = state.payments.dana.number;
+      $("danaName").value = state.payments.dana.name;
+      $("bankName").value = state.payments.bank.bank;
+      $("bankNumber").value = state.payments.bank.number;
+      $("bankHolder").value = state.payments.bank.name;
+      $("walletProvider").value = state.payments.ewallet.provider;
+      $("walletNumber").value = state.payments.ewallet.number;
+      $("walletName").value = state.payments.ewallet.name;
+      showPreview("qrisImagePreview", state.payments.qris.image);
+    }
+
+    function downloadCatalog() {
+      const content = JSON.stringify({ products: state.products, payments: state.payments }, null, 2) + "\n";
+      const url = URL.createObjectURL(new Blob([content], { type: "application/json" }));
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = "catalog.json";
+      anchor.click();
+      URL.revokeObjectURL(url);
+      setStatus("catalog.json terunduh. Gantikan file di repository GitHub, lalu commit dan push.");
+    }
+
+    async function loadInitialCatalog() {
+      try {
+        const response = await fetch("catalog.json", { cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        loadCatalog(await response.json());
+        setStatus("Katalog berhasil dimuat.");
+      } catch (error) {
+        console.error("Katalog gagal dimuat:", error);
+        renderProducts();
+        setStatus("Katalog belum bisa dibaca. Klik “Buka catalog.json” dan pilih file katalog dari folder proyek.");
+      }
+    }
+
+    $("addProduct").addEventListener("click", () => {
+      resetProductForm();
+      $("productEditor").hidden = false;
+      $("productEditor").scrollIntoView({ behavior: "smooth", block: "start" });
+      $("game").focus();
+    });
+    $("cancelProduct").addEventListener("click", resetProductForm);
+    $("productList").addEventListener("click", event => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const edit = target.closest("[data-edit]");
+      if (edit) editProduct(Number(edit.getAttribute("data-edit")));
+      const remove = target.closest("[data-delete]");
+      if (remove) {
+        const id = Number(remove.getAttribute("data-delete"));
+        const product = state.products.find(item => item.id === id);
+        if (product && confirm(`Hapus produk "${product.name}"?`)) {
+          state.products = state.products.filter(item => item.id !== id);
+          renderProducts();
+          setStatus("Produk dihapus dari editor. Unduh catalog.json untuk menerapkan perubahan.");
+        }
+      }
+    });
+    $("productImage").addEventListener("change", async event => {
+      try {
+        const image = await readImage(event.target.files[0]);
+        if (image) showPreview("productImagePreview", image);
+      } catch (error) {
+        event.target.value = "";
+        setStatus(error.message);
+      }
+    });
+    $("productForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      try {
+        const existing = state.products.find(item => item.id === state.editingId);
+        const image = await readImage($("productImage").files[0]);
+        const id = state.editingId ?? (state.products.length ? Math.max(...state.products.map(item => item.id)) + 1 : 1);
+        const product = {
+          ...(existing || {}),
+          id,
+          game: $("game").value.trim(),
+          short: $("short").value.trim(),
+          emoji: $("emoji").value.trim(),
+          seller: $("seller").value.trim(),
+          name: $("name").value.trim(),
+          price: Number($("price").value),
+          rating: Number($("rating").value).toFixed(1),
+          popularity: Number($("popularity").value),
+          stats: $("stats").value.split(",").map(item => item.trim()).filter(Boolean).slice(0, 6),
+          image: image || existing?.image || ""
+        };
+        if (!product.price || !product.game || !product.name || !product.seller) throw new Error("Lengkapi data produk yang wajib.");
+        const index = state.products.findIndex(item => item.id === id);
+        if (index < 0) state.products.push(product);
+        else state.products[index] = product;
+        renderProducts();
+        resetProductForm();
+        setStatus("Produk tersimpan di editor. Unduh catalog.json untuk menerapkan perubahan.");
+      } catch (error) {
+        setStatus(error.message);
+      }
+    });
+    $("paymentsForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      try {
+        const image = await readImage($("qrisImage").files[0]);
+        state.payments = {
+          dana: { number: $("danaNumber").value.trim(), name: $("danaName").value.trim() },
+          qris: { image: image || state.payments.qris.image || "", name: "" },
+          bank: { bank: $("bankName").value.trim(), number: $("bankNumber").value.trim(), name: $("bankHolder").value.trim() },
+          ewallet: { provider: $("walletProvider").value.trim(), number: $("walletNumber").value.trim(), name: $("walletName").value.trim() }
+        };
+        showPreview("qrisImagePreview", state.payments.qris.image);
+        $("qrisImage").value = "";
+        setStatus("Metode pembayaran tersimpan di editor. Unduh catalog.json untuk menerapkan perubahan.");
+      } catch (error) {
+        setStatus(error.message);
+      }
+    });
+    $("downloadCatalog").addEventListener("click", downloadCatalog);
+    $("importCatalog").addEventListener("change", async event => {
+      const file = event.target.files[0];
+      if (!file) return;
+      try {
+        loadCatalog(JSON.parse(await file.text()));
+        setStatus("Katalog berhasil dibuka. Perubahan akan berlaku setelah diunduh dan diunggah ke GitHub.");
+      } catch (error) {
+        setStatus(`Gagal membuka katalog: ${error.message}`);
+      } finally {
+        event.target.value = "";
+      }
+    });
+
+    loadInitialCatalog();
+  </script>
+</body>
+</html>
